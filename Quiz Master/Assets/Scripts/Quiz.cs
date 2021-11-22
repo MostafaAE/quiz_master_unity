@@ -6,16 +6,36 @@ using TMPro;
 using UnityEngine.UI;
 public class Quiz : MonoBehaviour
 {
+    [Header("Questions")]
     [SerializeField] TextMeshProUGUI questionText;
     [SerializeField] QuestionSO question;
+
+    [Header("Answers")]
     [SerializeField] GameObject[] answerButtons = new GameObject[4];
+
+    [Header("Buttons")]
     [SerializeField] Sprite defaultAnswerSprite;
     [SerializeField] Sprite correctAnswerSprite;
 
+    [Header("Timer")]
+    [SerializeField] Image timerImage;
+    Timer timer;
+
     void Start()
     {
+        timer = FindObjectOfType<Timer>();
         GetNextQuestion();
 
+    }
+
+    void Update()
+    {
+        timerImage.fillAmount = timer.fillFraction;
+        if (timer.loadNextQuestion)
+        {
+            GetNextQuestion();
+            timer.loadNextQuestion = false;
+        }
     }
 
     public void OnAnswerSelected(int index)
@@ -34,8 +54,9 @@ public class Quiz : MonoBehaviour
             questionText.text = "Sorry, the correct answer was;\n"+ correctAnswer;
             
         }
-        SetButtonState(false);
 
+        SetButtonState(false);
+        timer.CancelTimer();
     }
 
     void GetNextQuestion()
