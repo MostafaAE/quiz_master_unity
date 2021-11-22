@@ -14,12 +14,7 @@ public class Quiz : MonoBehaviour
 
     void Start()
     {
-        questionText.text = question.GetQuestion(); 
-        for(int i = 0; i < 4; i ++)
-        {
-            TextMeshProUGUI answerText = answerButtons[i].GetComponentInChildren<TextMeshProUGUI>();
-            answerText.text = question.GetAnswer(i);
-        }
+        GetNextQuestion();
 
     }
 
@@ -39,7 +34,48 @@ public class Quiz : MonoBehaviour
             questionText.text = "Sorry, the correct answer was;\n"+ correctAnswer;
             
         }
+        SetButtonState(false);
 
     }
 
+    void GetNextQuestion()
+    {
+        SetButtonState(true);
+        SetDefaultButtonSprites();
+        DisplayQuestion();
+    }
+
+
+
+
+    void DisplayQuestion()
+    {
+        questionText.text = question.GetQuestion();
+        for (int i = 0; i < answerButtons.Length; i++)
+        {
+            TextMeshProUGUI answerText = answerButtons[i].GetComponentInChildren<TextMeshProUGUI>();
+            answerText.text = question.GetAnswer(i);
+        }
+        
+    }
+
+
+    void SetButtonState(bool state)
+    {
+        for (int i = 0; i < answerButtons.Length; i++)
+        {
+            Button button = answerButtons[i].GetComponent<Button>();
+            button.interactable = state;
+        }
+    }
+
+    void SetDefaultButtonSprites()
+    {
+        for (int i = 0; i < answerButtons.Length; i++)
+        {
+            Image buttonImage = answerButtons[i].GetComponent<Image>();
+            buttonImage.sprite = defaultAnswerSprite;
+        }
+        
+    }
 }
