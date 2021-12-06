@@ -10,8 +10,12 @@ public class Timer : MonoBehaviour
     public bool loadNextQuestion;
     public float fillFraction;
 
-    bool isAnsweringQuestion;
+    public bool isAnsweringQuestion;
     float timerValue;
+    //private void Start()
+    //{
+    //    Debug.Log("from Timer timerValue = " + timerValue);
+    //}
     // Update is called once per frame
     void Update()
     {

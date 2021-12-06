@@ -8,7 +8,8 @@ public class Quiz : MonoBehaviour
 {
     [Header("Questions")]
     [SerializeField] TextMeshProUGUI questionText;
-    [SerializeField] QuestionSO question;
+    [SerializeField] List<QuestionSO> questions = new List<QuestionSO>();
+    QuestionSO currentQuestion;
 
     [Header("Answers")]
     [SerializeField] GameObject[] answerButtons = new GameObject[4];
@@ -21,10 +22,14 @@ public class Quiz : MonoBehaviour
     [SerializeField] Image timerImage;
     Timer timer;
 
+    bool hasAnsweredEarly;
+
     void Start()
     {
         timer = FindObjectOfType<Timer>();
-        GetNextQuestion();
+
+        // may need to be remove (laod question 2 times)
+        //GetNextQuestion();
 
     }
 
@@ -33,14 +38,30 @@ public class Quiz : MonoBehaviour
         timerImage.fillAmount = timer.fillFraction;
         if (timer.loadNextQuestion)
         {
+            hasAnsweredEarly = false;
             GetNextQuestion();
             timer.loadNextQuestion = false;
+        }
+
+        else if (!hasAnsweredEarly && !timer.isAnsweringQuestion)
+        {
+            DisplayAnswer(-1);
+            SetButtonState(false);
         }
     }
 
     public void OnAnswerSelected(int index)
     {
-        int correctAnswerIndex = question.GetCorrectAnswerIndex();
+
+        DisplayAnswer(index);
+        SetButtonState(false);
+        timer.CancelTimer();
+        hasAnsweredEarly = true;
+    }
+
+    void DisplayAnswer(int index)
+    {
+        int correctAnswerIndex = currentQuestion.GetCorrectAnswerIndex();
         Image buttonImage = answerButtons[correctAnswerIndex].GetComponent<Image>();
         buttonImage.sprite = correctAnswerSprite;
 
@@ -50,32 +71,42 @@ public class Quiz : MonoBehaviour
         }
         else
         {
-            string correctAnswer = question.GetAnswer(correctAnswerIndex);
-            questionText.text = "Sorry, the correct answer was;\n"+ correctAnswer;
-            
+            string correctAnswer = currentQuestion.GetAnswer(correctAnswerIndex);
+            questionText.text = "Sorry, the correct answer was;\n" + correctAnswer;
+
         }
-
-        SetButtonState(false);
-        timer.CancelTimer();
     }
-
     void GetNextQuestion()
     {
-        SetButtonState(true);
-        SetDefaultButtonSprites();
-        DisplayQuestion();
+        if (questions.Count > 0)
+        {
+            SetButtonState(true);
+            SetDefaultButtonSprites();
+            GetRandomQuestion();
+            DisplayQuestion();
+        }
     }
 
+    void GetRandomQuestion()
+    {
+        int index = Random.Range(0, questions.Count);
+        currentQuestion = questions[index];
+
+        if (questions.Contains(currentQuestion))
+        {
+            questions.Remove(currentQuestion);
+        }
+    }
 
 
 
     void DisplayQuestion()
     {
-        questionText.text = question.GetQuestion();
+        questionText.text = currentQuestion.GetQuestion();
         for (int i = 0; i < answerButtons.Length; i++)
         {
             TextMeshProUGUI answerText = answerButtons[i].GetComponentInChildren<TextMeshProUGUI>();
-            answerText.text = question.GetAnswer(i);
+            answerText.text = currentQuestion.GetAnswer(i);
         }
         
     }
