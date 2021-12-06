@@ -6,10 +6,9 @@ public class EndScreen : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI finalScoreText;
     ScoreKeeper scoreKeeper;
-    void Start()
+    void Awake()
     {
         scoreKeeper = FindObjectOfType<ScoreKeeper>();
-        ShowFinalScore();
     }
 
     public void ShowFinalScore()
